@@ -3,13 +3,31 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/sentiment_analyzer.php';
 
-// Check login
+// Check login and verify user exists in DB
 if (!isset($_SESSION['user_id'])) {
+    session_write_close();
     header("Location: index.php");
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
+
+// Verify user exists in the database (handles local database resets/deletions)
+$stmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+if (!$stmt->fetch()) {
+    $_SESSION = [];
+    session_destroy();
+    session_write_close();
+    if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Your session is invalid or the database was reset. Please refresh the page and sign up again.']);
+    } else {
+        header("Location: index.php");
+    }
+    exit;
+}
+
 $username = $_SESSION['username'];
 $age = $_SESSION['age'];
 $gender = $_SESSION['gender'];
@@ -145,6 +163,8 @@ Please generate the de-addiction plan now.";
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -166,7 +186,7 @@ Please generate the de-addiction plan now.";
         $plan_text = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
     } else {
         // 4. API Request to Hugging Face Serverless Chat Completion API
-        $api_url = "https://api-inference.huggingface.co/v1/chat/completions";
+        $api_url = "https://router.huggingface.co/v1/chat/completions";
         $post_data = [
             "model" => $hf_model,
             "messages" => [
@@ -185,6 +205,8 @@ Please generate the de-addiction plan now.";
             "Authorization: Bearer " . $hf_token,
             "Content-Type: application/json"
         ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

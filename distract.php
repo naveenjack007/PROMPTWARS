@@ -79,6 +79,8 @@ Provide the 5-minute distraction activity now.";
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
             curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             
             $response = curl_exec($ch);
             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -100,7 +102,7 @@ Provide the 5-minute distraction activity now.";
             $exercise_text = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
         } else {
             // Hugging Face
-            $api_url = "https://api-inference.huggingface.co/v1/chat/completions";
+            $api_url = "https://router.huggingface.co/v1/chat/completions";
             $post_data = [
                 "model" => $hf_model,
                 "messages" => [
@@ -119,6 +121,8 @@ Provide the 5-minute distraction activity now.";
                 "Authorization: Bearer " . $hf_token,
                 "Content-Type: application/json"
             ]);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             
             $response = curl_exec($ch);
             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

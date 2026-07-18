@@ -1,8 +1,15 @@
 <?php
 // De-Addiction Web App Global Configuration
 
-// 1. Session start
+// 1. Configure session path and start session
 if (session_status() == PHP_SESSION_NONE) {
+    $session_dir = __DIR__ . '/sessions';
+    if (!file_exists($session_dir)) {
+        @mkdir($session_dir, 0777, true);
+    }
+    if (is_writable($session_dir)) {
+        session_save_path($session_dir);
+    }
     session_start();
 }
 

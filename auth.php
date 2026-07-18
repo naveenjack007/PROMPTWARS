@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['gender'] = $gender;
             
             // Redirect to setup plan since they are a new user
+            session_write_close();
             header("Location: setup_plan.php");
             exit;
             
@@ -75,8 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("SELECT id FROM plans WHERE user_id = ? ORDER BY id DESC LIMIT 1");
                 $stmt->execute([$user['id']]);
                 if ($stmt->fetch()) {
+                    session_write_close();
                     header("Location: dashboard.php");
                 } else {
+                    session_write_close();
                     header("Location: setup_plan.php");
                 }
                 exit;
@@ -94,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'logout') {
     $_SESSION = [];
     session_destroy();
+    session_write_close();
     header("Location: index.php");
     exit;
 }

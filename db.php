@@ -72,9 +72,9 @@ function setup_database_tables($pdo) {
             
             // For SQLite compatibility, we might need to adjust AUTO_INCREMENT and some data types.
             if (DB_TYPE === 'sqlite') {
-                $schema_sql = str_ireplace('AUTO_INCREMENT', '', $schema_sql);
-                $schema_sql = str_ireplace('INT PRIMARY KEY', 'INTEGER PRIMARY KEY AUTOINCREMENT', $schema_sql);
                 $schema_sql = str_ireplace('INT AUTO_INCREMENT PRIMARY KEY', 'INTEGER PRIMARY KEY AUTOINCREMENT', $schema_sql);
+                $schema_sql = str_ireplace('INT PRIMARY KEY', 'INTEGER PRIMARY KEY AUTOINCREMENT', $schema_sql);
+                $schema_sql = str_ireplace('AUTO_INCREMENT', '', $schema_sql);
                 $schema_sql = str_ireplace('TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $schema_sql);
                 $schema_sql = str_ireplace('TIMESTAMP DEFAULT CURRENT_TIMESTAMP', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $schema_sql);
                 $schema_sql = str_ireplace('TINYINT(1)', 'INTEGER', $schema_sql);

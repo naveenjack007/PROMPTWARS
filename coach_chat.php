@@ -147,6 +147,8 @@ Recent Daily Check-in Logs:
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
             curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             
             $response = curl_exec($ch);
             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -169,7 +171,7 @@ Recent Daily Check-in Logs:
 
         } else {
             // Call Hugging Face API
-            $api_url = "https://api-inference.huggingface.co/v1/chat/completions";
+            $api_url = "https://router.huggingface.co/v1/chat/completions";
             
             $messages = [
                 ["role" => "system", "content" => $system_prompt]
@@ -197,6 +199,8 @@ Recent Daily Check-in Logs:
                 "Authorization: Bearer " . $hf_token,
                 "Content-Type: application/json"
             ]);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             
             $response = curl_exec($ch);
             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

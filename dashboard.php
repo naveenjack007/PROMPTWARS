@@ -3,11 +3,23 @@ require_once __DIR__ . '/db.php';
 
 // Authentication check
 if (!isset($_SESSION['user_id'])) {
+    session_write_close();
     header("Location: index.php");
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
+
+// Verify user exists in the database
+$stmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+if (!$stmt->fetch()) {
+    $_SESSION = [];
+    session_destroy();
+    session_write_close();
+    header("Location: index.php");
+    exit;
+}
 $username = $_SESSION['username'];
 $age = $_SESSION['age'];
 $gender = $_SESSION['gender'];
